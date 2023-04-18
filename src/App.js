@@ -165,6 +165,15 @@ export default function App() {
     location.reload();
   };
 
+  const handleLogoutAllSessions = () => {
+    const decoded = atob(window.sessionStorage.getItem('userCode'));
+    sessionStorage.removeItem('user');
+    sessionStorage.removeItem('userCode');
+    remove(ref(db, `/usuarios/`));
+    remove(ref(db, `/cartas_usuario/`));
+    location.reload();
+  };
+
   return (
     <>
       <body>
@@ -179,6 +188,9 @@ export default function App() {
                 <Button variant="dark" onClick={handleLogout}>
                   {name} | Logout
                 </Button>
+                <Button variant="light" onClick={handleLogoutAllSessions}>
+                  Logout All Sessions
+                </Button>{' '}
               </Navbar.Text>
             </Navbar.Collapse>
           </Container>
