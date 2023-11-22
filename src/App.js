@@ -96,6 +96,7 @@ export default function App() {
     //read
     onValue(ref(db), (snapshot) => {
       const data = snapshot.val();
+      console.log(data);
       setData(data);
       setShowResults(data.status.status);
       if (data.hasOwnProperty('cartas_usuario')) {
