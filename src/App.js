@@ -100,13 +100,10 @@ export default function App() {
       const new_users = [];
 
       if (data.usuarios) {
-        console.log('deb');
         Object.values(data.usuarios).forEach((val) => {
-          // console.log(val);
           if (!new_users.includes(val.user)) new_users.push(val.user);
         });
         data.new_usuarios = new_users;
-        // console.log(data.new_usuarios);
       }
 
       setData(data);
@@ -156,14 +153,18 @@ export default function App() {
   };
 
   const handleSubmitName = () => {
-    const uuid = uid();
-    window.sessionStorage.setItem('user', name);
-    window.sessionStorage.setItem('userCode', btoa(uuid));
-    set(ref(db, `/usuarios/${uuid}`), {
-      user: name,
-      id: uuid,
-    });
-    setShow(false);
+    if (data.new_usuarios.includes(name)) {
+      alert('Usuario Ya registrado');
+    } else {
+      const uuid = uid();
+      window.sessionStorage.setItem('user', name);
+      window.sessionStorage.setItem('userCode', btoa(uuid));
+      set(ref(db, `/usuarios/${uuid}`), {
+        user: name,
+        id: uuid,
+      });
+      setShow(false);
+    }
   };
 
   const handleName = (e) => {
