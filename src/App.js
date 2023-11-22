@@ -96,7 +96,19 @@ export default function App() {
     //read
     onValue(ref(db), (snapshot) => {
       const data = snapshot.val();
-      console.log(data);
+      console.log(data.usuarios);
+      const new_users = [];
+
+      if (data.usuarios) {
+        console.log('deb');
+        Object.values(data.usuarios).forEach((val) => {
+          // console.log(val);
+          if (!new_users.includes(val.user)) new_users.push(val.user);
+        });
+        data.new_usuarios = new_users;
+        // console.log(data.new_usuarios);
+      }
+
       setData(data);
       setShowResults(data.status.status);
       if (data.hasOwnProperty('cartas_usuario')) {
@@ -206,10 +218,10 @@ export default function App() {
                     &nbsp;
                   </Badge>
                   &nbsp;
-                  {Object.values(data.usuarios).map((u) => (
+                  {data.new_usuarios.map((u) => (
                     <>
-                      <Badge pill bg="dark" key={u.user}>
-                        {u.user}
+                      <Badge pill bg="dark" key={u}>
+                        {u}
                       </Badge>
                       &nbsp;
                     </>
