@@ -13,7 +13,7 @@ import {
 import { useState, useEffect } from 'react';
 import { computeHeadingLevel } from '@testing-library/react';
 
-import { Button } from 'react-bootstrap';
+import { Button, Row, Col } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import Badge from 'react-bootstrap/Badge';
@@ -25,6 +25,12 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 import { decode as base64_decode, encode as base64_encode } from 'base-64';
 
 export default function App() {
+  // session
+  const [showSession, setShowSession] = useState(false);
+  const handleCloseSession = () => setShowSession(false);
+  const [nameSession, setNameSession] = useState('');
+
+  // user
   const [showResults, setShowResults] = useState(false);
   const [show, setShow] = useState(false);
   const [name, setName] = useState('');
@@ -75,8 +81,9 @@ export default function App() {
   useEffect(() => {
     const uuid = uid();
     if (window.sessionStorage.getItem('user') === null) {
-      setShow(true);
+      // setShow(true);
       // setName(uuid);
+      setShowSession(true);
     } else {
       setName(window.sessionStorage.getItem('user'));
     }
@@ -93,10 +100,13 @@ export default function App() {
   });
   // write
   useEffect(() => {
+    const uuid = uid();
+    setNameSession(uuid);
     //read
     onValue(ref(db), (snapshot) => {
       const data = snapshot.val();
-      console.log(data.usuarios);
+      // console.log(data);
+      // console.log(data.usuarios);
       const new_users = [];
 
       if (data.usuarios) {
@@ -105,7 +115,7 @@ export default function App() {
         });
         data.new_usuarios = new_users;
       }
-
+      // console.log('Data', data.new_usuarios);
       setData(data);
       setShowResults(data.status.status);
       if (data.hasOwnProperty('cartas_usuario')) {
@@ -151,31 +161,90 @@ export default function App() {
       });
     }
   };
+  const handleName = (e) => {
+    setName(e.target.value);
+    console.log(e.target.value);
+  };
+  // const handleSubmitName = () => {
+  //   if (data.new_usuarios.includes(name)) {
+  //     alert('Usuario Ya registrado');
+  //   } else {
+  //     const uuid = uid();
+  //     window.sessionStorage.setItem('user', name);
+  //     window.sessionStorage.setItem('userCode', btoa(uuid));
+  //     set(ref(db, `/usuarios/${uuid}`), {
+  //       user: name,
+  //       id: uuid,
+  //     });
+  //     setShow(false);
+  //   }
+  // };
 
-  const handleSubmitName = () => {
-    if (data.new_usuarios.includes(name)) {
-      alert('Usuario Ya registrado');
+  const handleNameSession = (e) => {
+    setNameSession(e.target.value);
+  };
+  const handleSubmitNameSession = () => {
+    if (data.new_usuarios) {
+      const users = data.new_usuarios;
+      if (users.includes(name)) {
+        alert('Usuario Ya registrado');
+      } else {
+        const uuid = uid();
+        window.sessionStorage.setItem('user', name);
+        window.sessionStorage.setItem('userCode', btoa(uuid));
+        window.sessionStorage.setItem('session_id', nameSession);
+        // create user
+        set(ref(db, `/usuarios/${uuid}`), {
+          user: name,
+          id: uuid,
+          session_id: nameSession,
+        });
+        // create session
+        set(ref(db, `/session/${nameSession}`), {
+          session_id: nameSession,
+          status: true,
+        });
+        // add user to session
+        console.log('Creating users sesion names ');
+        update(ref(db, `/session/${nameSession}/users/${name}`), {
+          user: name,
+          id: uuid,
+          session_id: nameSession,
+          status: true,
+        });
+        // status
+        set(ref(db, `status/`), {
+          session_id: nameSession,
+          status: true,
+        });
+        setShowSession(false);
+      }
     } else {
       const uuid = uid();
       window.sessionStorage.setItem('user', name);
       window.sessionStorage.setItem('userCode', btoa(uuid));
+      window.sessionStorage.setItem('session_id', nameSession);
       set(ref(db, `/usuarios/${uuid}`), {
         user: name,
         id: uuid,
+        session_id: nameSession,
       });
-      setShow(false);
+      // create session
+      set(ref(db, `/session/${nameSession}`), {
+        session_id: nameSession,
+        status: true,
+      });
+      setShowSession(false);
     }
-  };
-
-  const handleName = (e) => {
-    setName(e.target.value);
   };
 
   const handleLogout = () => {
     const decoded = atob(window.sessionStorage.getItem('userCode'));
     sessionStorage.removeItem('user');
     sessionStorage.removeItem('userCode');
+    sessionStorage.removeItem('session_id');
     remove(ref(db, `/usuarios/${decoded}`));
+    remove(ref(db, `/session/${nameSession}`));
     location.reload();
   };
 
@@ -183,8 +252,10 @@ export default function App() {
     const decoded = atob(window.sessionStorage.getItem('userCode'));
     sessionStorage.removeItem('user');
     sessionStorage.removeItem('userCode');
+    sessionStorage.removeItem('session_id');
     remove(ref(db, `/usuarios/`));
     remove(ref(db, `/cartas_usuario/`));
+    remove(ref(db, `/session/`));
     location.reload();
   };
 
@@ -200,6 +271,9 @@ export default function App() {
             <Navbar.Collapse className="justify-content-end">
               <Navbar.Text>
                 <Button variant="dark" onClick={handleLogout}>
+                  {nameSession} | Session ID
+                </Button>
+                <Button variant="dark" onClick={handleLogout}>
                   {name} | Logout
                 </Button>
                 <Button variant="light" onClick={handleLogoutAllSessions}>
@@ -213,7 +287,7 @@ export default function App() {
         <div>
           <div className="container">
             <div>
-              {data.hasOwnProperty('usuarios') && loggedUsers ? (
+              {/* {data.hasOwnProperty('usuarios') && loggedUsers ? (
                 <>
                   <Badge pill bg="danger">
                     &nbsp;
@@ -230,7 +304,7 @@ export default function App() {
                 </>
               ) : (
                 <></>
-              )}
+              )} */}
             </div>
 
             <br />
@@ -331,7 +405,7 @@ export default function App() {
         </Navbar>
 
         {/* alert name */}
-        <>
+        {/* <>
           <Modal
             show={show}
             onHide={handleClose}
@@ -354,6 +428,69 @@ export default function App() {
             </Modal.Body>
             <Modal.Footer>
               <Button variant="primary" onClick={handleSubmitName}>
+                Continuar
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        </> */}
+
+        {/* alert session */}
+        <>
+          <Modal
+            show={showSession}
+            onHide={handleCloseSession}
+            backdrop="static"
+            keyboard={false}
+          >
+            <Modal.Header closeButton>
+              <Modal.Title>Session</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Row>
+                <Col
+                  style={{
+                    border: `1px solid #ced4da`,
+                    borderRadius: `5px`,
+                    height: `110px`,
+                  }}
+                >
+                  <h4>Create Session: </h4>
+                  {nameSession}
+                </Col>
+                <Col
+                  style={{
+                    border: `1px solid #ced4da`,
+                    borderRadius: `5px`,
+                    height: `110px`,
+                  }}
+                >
+                  <h4>Join Session: </h4>
+                  <Form>
+                    <Form.Group className="mb-3" controlId="Name">
+                      <Form.Control
+                        type="text"
+                        placeholder="Session ID"
+                        onChange={handleNameSession}
+                      />
+                    </Form.Group>
+                  </Form>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <h4>Name to display</h4>
+                  <Form.Group className="mb-3" controlId="Name">
+                    <Form.Control
+                      type="text"
+                      placeholder="John"
+                      onChange={handleName}
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="primary" onClick={handleSubmitNameSession}>
                 Continuar
               </Button>
             </Modal.Footer>
