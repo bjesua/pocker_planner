@@ -204,6 +204,7 @@ export default function App() {
           session_id: nameSession,
           status: true,
         });
+
         // add user to session
         console.log('Creating users sesion names ');
         update(ref(db, `/session/${nameSession}/users/${name}`), {
