@@ -29,6 +29,7 @@ export default function App() {
   const [showSession, setShowSession] = useState(false);
   const handleCloseSession = () => setShowSession(false);
   const [nameSession, setNameSession] = useState('');
+  const [nameSessionManual, setNameSessionManual] = useState('');
 
   // user
   const [showResults, setShowResults] = useState(false);
@@ -183,6 +184,9 @@ export default function App() {
   const handleNameSession = (e) => {
     setNameSession(e.target.value);
   };
+  const handleNameSessionManual = (e) => {
+    nameSessionManual(e.target.value);
+  };
   const handleSubmitNameSession = () => {
     if (data.new_usuarios) {
       const users = data.new_usuarios;
@@ -193,6 +197,11 @@ export default function App() {
         window.sessionStorage.setItem('user', name);
         window.sessionStorage.setItem('userCode', btoa(uuid));
         window.sessionStorage.setItem('session_id', nameSession);
+
+        if (nameSessionManual != '') {
+          nameSession = nameSessionManual;
+        }
+
         // create user
         set(ref(db, `/usuarios/${uuid}`), {
           user: name,
@@ -471,7 +480,7 @@ export default function App() {
                       <Form.Control
                         type="text"
                         placeholder="Session ID"
-                        onChange={handleNameSession}
+                        onChange={handleNameSessionManual}
                       />
                     </Form.Group>
                   </Form>
