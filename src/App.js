@@ -27,9 +27,12 @@ import { decode as base64_decode, encode as base64_encode } from 'base-64';
 export default function App() {
   // session
   const [showSession, setShowSession] = useState(false);
+  const [choooseOption, setChoooseOption] = useState(false);
   const handleCloseSession = () => setShowSession(false);
+  const handleCloseChoooseOption = () => setChoooseOption(false);
   const [nameSession, setNameSession] = useState('');
-  const [nameSessionManual, setNameSessionManual] = useState('');
+  const [showCreateSession, setshowCreateSession] = useState('');
+  
 
   // user
   const [showResults, setShowResults] = useState(false);
@@ -101,13 +104,13 @@ export default function App() {
   });
   // write
   useEffect(() => {
-    const uuid = uid();
-    setNameSession(uuid);
     //read
     onValue(ref(db), (snapshot) => {
+      const uuid = uid();
+      setNameSession(uuid);
+
       const data = snapshot.val();
-      // console.log(data);
-      // console.log(data.usuarios);
+
       const new_users = [];
 
       if (data.usuarios) {
@@ -137,7 +140,7 @@ export default function App() {
         });
       }
     });
-  }, [name]);
+  }, []);
 
   const cleanAll = () => {
     remove(ref(db, `/cartas_usuario/`));
@@ -185,7 +188,8 @@ export default function App() {
     setNameSession(e.target.value);
   };
   const handleNameSessionManual = (e) => {
-    nameSessionManual(e.target.value);
+    // setNameSessionManual(e.target.value);
+    setNameSession(e.target.value);
   };
   const handleSubmitNameSession = () => {
     if (data.new_usuarios) {
@@ -194,13 +198,6 @@ export default function App() {
         alert('Usuario Ya registrado');
       } else {
         const uuid = uid();
-        window.sessionStorage.setItem('user', name);
-        window.sessionStorage.setItem('userCode', btoa(uuid));
-        window.sessionStorage.setItem('session_id', nameSession);
-
-        if (nameSessionManual != '') {
-          nameSession = nameSessionManual;
-        }
 
         // create user
         set(ref(db, `/usuarios/${uuid}`), {
@@ -208,6 +205,7 @@ export default function App() {
           id: uuid,
           session_id: nameSession,
         });
+
         // create session
         set(ref(db, `/session/${nameSession}`), {
           session_id: nameSession,
@@ -222,11 +220,17 @@ export default function App() {
           session_id: nameSession,
           status: true,
         });
+
         // status
         set(ref(db, `status/`), {
           session_id: nameSession,
           status: true,
         });
+
+        window.sessionStorage.setItem('user', name);
+        window.sessionStorage.setItem('userCode', btoa(uuid));
+        window.sessionStorage.setItem('session_id', nameSession);
+
         setShowSession(false);
       }
     } else {
@@ -445,7 +449,7 @@ export default function App() {
         </> */}
 
         {/* alert session */}
-        <>
+        {/* <>
           <Modal
             show={showSession}
             onHide={handleCloseSession}
@@ -484,6 +488,65 @@ export default function App() {
                       />
                     </Form.Group>
                   </Form>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <h4>Name to display</h4>
+                  <Form.Group className="mb-3" controlId="Name">
+                    <Form.Control
+                      type="text"
+                      placeholder="John"
+                      onChange={handleName}
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="primary" onClick={handleSubmitNameSession}>
+                Continuar
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        </> */}
+
+        {/* alert session */}
+        <>
+          <Modal
+            show={showSession}
+            onHide={handleCloseSession}
+            backdrop="static"
+            keyboard={false}
+          >
+            {/* <Modal.Header closeButton>
+              <Modal.Title>Session</Modal.Title>
+            </Modal.Header> */}
+            <Modal.Body>
+              <Row>
+                <Col
+                  // style={{
+                  //   border: `1px solid #ced4da`,
+                  //   borderRadius: `5px`,
+                  //   height: `110px`,
+                  // }}
+                >
+                  {/* <h4>C: </h4> */}
+                  <Button variant="primary" size="lg" onClick={handleSubmitNameSession}>
+                  Create Session
+                  </Button>
+                </Col>
+                <Col
+                  // style={{
+                  //   border: `1px solid #ced4da`,
+                  //   borderRadius: `5px`,
+                  //   height: `110px`,
+                  // }}
+                >
+                  {/* <h4>: </h4> */}
+                  <Button variant="info" size="lg" onClick={handleSubmitNameSession}>
+                  Join Session
+                  </Button>
                 </Col>
               </Row>
               <Row>
