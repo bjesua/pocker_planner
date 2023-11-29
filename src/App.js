@@ -31,7 +31,6 @@ export default function App() {
   const handleCloseSession = () => setShowSession(false);
   const handleCloseChoooseOption = () => setChoooseOption(false);
   const [nameSession, setNameSession] = useState('');
-  const [showCreateSession, setshowCreateSession] = useState('');
 
   const [showInsertId, setShowInsertId] = useState({
     create_session: false,
@@ -60,33 +59,43 @@ export default function App() {
 
   const handleCardClick = (value) => {
     // console.log(JSON.stringify(data));
+    // console.log(data)
+
+
 
     const uuid = uid();
     if (data.hasOwnProperty('cartas_usuario')) {
       const filteredObj = Object.values(data.cartas_usuario).filter(
         (item) => item.user.toLowerCase() === name.toLocaleLowerCase()
-      );
-
-      if (filteredObj[0]) {
-        set(ref(db, `/cartas_usuario/${filteredObj[0].id}`), {
+      )[0]
+      console.log(filteredObj)
+      if (filteredObj) {
+        set(ref(db, `/cartas_usuario/${filteredObj.id}`), {
           carta: value,
           user: name,
-          id: filteredObj[0].id,
+          id: filteredObj.id,
+          user_id : atob(window.sessionStorage.getItem('userCode')),
+          session_id: nameSession,
         });
       } else {
-        set(ref(db, `/cartas_usuario/${uuid}`), {
-          carta: value,
-          user: name,
-          id: uuid,
-        });
+    //     set(ref(db, `/cartas_usuario/${uuid}`), {
+    //       carta: value,
+    //       user: name,
+    //       id: uuid,
+    //       user_id : atob(window.sessionStorage.getItem('userCode')),
+    //       session_id: nameSession,
+    //     });
       }
     } else {
       set(ref(db, `/cartas_usuario/${uuid}`), {
         carta: value,
         user: name,
         id: uuid,
+        user_id : atob(window.sessionStorage.getItem('userCode')),
+        session_id: nameSession
       });
     }
+
   };
 
   function copyToClipboard(e) {
