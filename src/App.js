@@ -92,8 +92,6 @@ export default function App() {
   function copyToClipboard(e) {
     textAreaRef.current.select();
     document.execCommand('copy');
-    // This is just personal preference.
-    // I prefer to not show the whole text area selected.
     e.target.focus();
     setCopySuccess('Copied!');
   }
@@ -101,8 +99,6 @@ export default function App() {
   useEffect(() => {
     const uuid = uid();
     if (window.sessionStorage.getItem('user') === null) {
-      // setShow(true);
-      // setName(uuid);
       setShowSession(true);
     } else {
       setName(window.sessionStorage.getItem('user'));
@@ -183,6 +179,10 @@ export default function App() {
     setName(e.target.value);
     console.log(e.target.value);
   };
+  const handleNameSessionOption2 = (e) => {
+    setNameSession(e.target.value);
+    console.log(e.target.value);
+  };
   // const handleSubmitName = () => {
   //   if (data.new_usuarios.includes(name)) {
   //     alert('Usuario Ya registrado');
@@ -225,7 +225,7 @@ export default function App() {
     }
   };
   const handleSubmitNameSession = (option) => {
-    console.log(option);
+    // console.log(option);
     if (data.new_usuarios) {
       const users = data.new_usuarios;
       if (users.includes(name)) {
@@ -254,6 +254,7 @@ export default function App() {
           status: true,
         });
 
+        // setNameSession(nameSession);
         window.sessionStorage.setItem('user', name);
         window.sessionStorage.setItem('userCode', btoa(uuid));
         window.sessionStorage.setItem('session_id', nameSession);
@@ -328,7 +329,7 @@ export default function App() {
         <div>
           <div className="container">
             <div>
-              {/* {data.hasOwnProperty('usuarios') && loggedUsers ? (
+              {data.hasOwnProperty('usuarios') && loggedUsers ? (
                 <>
                   <Badge pill bg="danger">
                     &nbsp;
@@ -345,10 +346,11 @@ export default function App() {
                 </>
               ) : (
                 <></>
-              )} */}
+              )}
             </div>
 
             <br />
+
             <div>
               <Button variant="warning" onClick={() => cleanAll()}>
                 Iniciar Nuevamente
@@ -435,108 +437,13 @@ export default function App() {
 
         <Navbar fixed="bottom">
           <Container>
-            <Navbar.Brand href="/">
-              {/* Poker Planner <Badge bg="dark">Beta</Badge> */}
-            </Navbar.Brand>
+            <Navbar.Brand href="/"></Navbar.Brand>
             <Navbar.Toggle />
             <Navbar.Collapse className="justify-content-end">
               <Navbar.Text>By: Jesua Sagastume</Navbar.Text>
             </Navbar.Collapse>
           </Container>
         </Navbar>
-
-        {/* alert name */}
-        {/* <>
-          <Modal
-            show={show}
-            onHide={handleClose}
-            backdrop="static"
-            keyboard={false}
-          >
-            <Modal.Header closeButton>
-              <Modal.Title>Ingresa tu nombre</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <Form>
-                <Form.Group className="mb-3" controlId="Name">
-                  <Form.Control
-                    type="text"
-                    placeholder="John"
-                    onChange={handleName}
-                  />
-                </Form.Group>
-              </Form>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="primary" onClick={handleSubmitName}>
-                Continuar
-              </Button>
-            </Modal.Footer>
-          </Modal>
-        </> */}
-
-        {/* alert session */}
-        {/* <>
-          <Modal
-            show={showSession}
-            onHide={handleCloseSession}
-            backdrop="static"
-            keyboard={false}
-          >
-            <Modal.Header closeButton>
-              <Modal.Title>Session</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <Row>
-                <Col
-                  style={{
-                    border: `1px solid #ced4da`,
-                    borderRadius: `5px`,
-                    height: `110px`,
-                  }}
-                >
-                  <h4>Create Session: </h4>
-                  {nameSession}
-                </Col>
-                <Col
-                  style={{
-                    border: `1px solid #ced4da`,
-                    borderRadius: `5px`,
-                    height: `110px`,
-                  }}
-                >
-                  <h4>Join Session: </h4>
-                  <Form>
-                    <Form.Group className="mb-3" controlId="Name">
-                      <Form.Control
-                        type="text"
-                        placeholder="Session ID"
-                        onChange={handleNameSessionManual}
-                      />
-                    </Form.Group>
-                  </Form>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <h4>Name to display</h4>
-                  <Form.Group className="mb-3" controlId="Name">
-                    <Form.Control
-                      type="text"
-                      placeholder="John"
-                      onChange={handleName}
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="primary" onClick={handleSubmitNameSession}>
-                Continuar
-              </Button>
-            </Modal.Footer>
-          </Modal>
-        </> */}
 
         {/* alert session */}
         <>
@@ -546,9 +453,6 @@ export default function App() {
             backdrop="static"
             keyboard={false}
           >
-            {/* <Modal.Header closeButton>
-              <Modal.Title>Session</Modal.Title>
-            </Modal.Header> */}
             <Modal.Body>
               <Row>
                 <Col
@@ -584,13 +488,6 @@ export default function App() {
                 {showInsertId.create_session ? (
                   <Col>
                     Session ID
-                    {/* <Form.Group className="mb-3" controlId="Name">
-                      <Form.Control
-                        type="text"
-                        placeholder=""
-                        onChange={handleName}
-                      />
-                    </Form.Group> */}
                     <InputGroup className="mb-3">
                       <Form.Control
                         defaultValue={nameSession}
@@ -619,7 +516,7 @@ export default function App() {
                       <Form.Control
                         type="text"
                         placeholder=""
-                        onChange={handleName}
+                        onChange={handleNameSessionOption2}
                       />
                     </Form.Group>
                   </Col>
