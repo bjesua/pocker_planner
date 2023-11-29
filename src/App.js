@@ -61,41 +61,38 @@ export default function App() {
     // console.log(JSON.stringify(data));
     // console.log(data)
 
-
-
     const uuid = uid();
     if (data.hasOwnProperty('cartas_usuario')) {
       const filteredObj = Object.values(data.cartas_usuario).filter(
         (item) => item.user.toLowerCase() === name.toLocaleLowerCase()
-      )[0]
-      console.log(filteredObj)
+      )[0];
+      console.log(filteredObj);
       if (filteredObj) {
         set(ref(db, `/cartas_usuario/${filteredObj.id}`), {
           carta: value,
           user: name,
           id: filteredObj.id,
-          user_id : atob(window.sessionStorage.getItem('userCode')),
+          user_id: atob(window.sessionStorage.getItem('userCode')),
           session_id: nameSession,
         });
       } else {
-    //     set(ref(db, `/cartas_usuario/${uuid}`), {
-    //       carta: value,
-    //       user: name,
-    //       id: uuid,
-    //       user_id : atob(window.sessionStorage.getItem('userCode')),
-    //       session_id: nameSession,
-    //     });
+        //     set(ref(db, `/cartas_usuario/${uuid}`), {
+        //       carta: value,
+        //       user: name,
+        //       id: uuid,
+        //       user_id : atob(window.sessionStorage.getItem('userCode')),
+        //       session_id: nameSession,
+        //     });
       }
     } else {
       set(ref(db, `/cartas_usuario/${uuid}`), {
         carta: value,
         user: name,
         id: uuid,
-        user_id : atob(window.sessionStorage.getItem('userCode')),
-        session_id: nameSession
+        user_id: atob(window.sessionStorage.getItem('userCode')),
+        session_id: nameSession,
       });
     }
-
   };
 
   function copyToClipboard(e) {
@@ -111,6 +108,10 @@ export default function App() {
       setShowSession(true);
     } else {
       setName(window.sessionStorage.getItem('user'));
+    }
+
+    if (window.sessionStorage.getItem('session_id') != null) {
+      setNameSession(window.sessionStorage.getItem('session_id'));
     }
 
     if (data.hasOwnProperty('cartas_usuario')) {
@@ -129,6 +130,16 @@ export default function App() {
 
     onValue(ref(db), (snapshot) => {
       const data = snapshot.val();
+      // console.log(data);
+      const filtered_cartas_usuario = [];
+      if (data.hasOwnProperty('cartas_usuario')) {
+        console.log(data.cartas_usuario)
+        // const filtered = Object.values(data.cartas_usuario).filter(
+        //   (item) => item.session_id === nameSession
+        // );
+
+        // console.log('Data: ', nameSession, filtered);
+      }
 
       const new_users = [];
 
