@@ -10,10 +10,10 @@ import {
   remove,
   update,
 } from 'firebase/database';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { computeHeadingLevel } from '@testing-library/react';
 
-import { Button, Row, Col } from 'react-bootstrap';
+import { Button, Row, Col, InputGroup } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import Badge from 'react-bootstrap/Badge';
@@ -32,7 +32,14 @@ export default function App() {
   const handleCloseChoooseOption = () => setChoooseOption(false);
   const [nameSession, setNameSession] = useState('');
   const [showCreateSession, setshowCreateSession] = useState('');
-  
+
+  const [showInsertId, setShowInsertId] = useState({
+    create_session: false,
+    join_session: false,
+    option: 0,
+  });
+  const textAreaRef = useRef(null);
+  const [copySuccess, setCopySuccess] = useState('');
 
   // user
   const [showResults, setShowResults] = useState(false);
@@ -82,6 +89,15 @@ export default function App() {
     }
   };
 
+  function copyToClipboard(e) {
+    textAreaRef.current.select();
+    document.execCommand('copy');
+    // This is just personal preference.
+    // I prefer to not show the whole text area selected.
+    e.target.focus();
+    setCopySuccess('Copied!');
+  }
+
   useEffect(() => {
     const uuid = uid();
     if (window.sessionStorage.getItem('user') === null) {
@@ -105,10 +121,8 @@ export default function App() {
   // write
   useEffect(() => {
     //read
-    onValue(ref(db), (snapshot) => {
-      const uuid = uid();
-      setNameSession(uuid);
 
+    onValue(ref(db), (snapshot) => {
       const data = snapshot.val();
 
       const new_users = [];
@@ -191,7 +205,27 @@ export default function App() {
     // setNameSessionManual(e.target.value);
     setNameSession(e.target.value);
   };
-  const handleSubmitNameSession = () => {
+  const handleChooseOp = (option) => {
+    // console.log(option);
+    if (option == 1) {
+      const uuid = uid();
+      setNameSession(uuid);
+      setShowInsertId({
+        create_session: true,
+        join_session: false,
+        option: 1,
+      });
+    } else if (option == 2) {
+      setCopySuccess('');
+      setShowInsertId({
+        create_session: false,
+        join_session: true,
+        option: 2,
+      });
+    }
+  };
+  const handleSubmitNameSession = (option) => {
+    console.log(option);
     if (data.new_usuarios) {
       const users = data.new_usuarios;
       if (users.includes(name)) {
@@ -206,20 +240,13 @@ export default function App() {
           session_id: nameSession,
         });
 
-        // create session
-        set(ref(db, `/session/${nameSession}`), {
-          session_id: nameSession,
-          status: true,
-        });
-
-        // add user to session
-        console.log('Creating users sesion names ');
-        update(ref(db, `/session/${nameSession}/users/${name}`), {
-          user: name,
-          id: uuid,
-          session_id: nameSession,
-          status: true,
-        });
+        if (showInsertId == 1) {
+          // create session
+          set(ref(db, `/session/${nameSession}`), {
+            session_id: nameSession,
+            status: true,
+          });
+        }
 
         // status
         set(ref(db, `status/`), {
@@ -525,29 +552,80 @@ export default function App() {
             <Modal.Body>
               <Row>
                 <Col
-                  // style={{
-                  //   border: `1px solid #ced4da`,
-                  //   borderRadius: `5px`,
-                  //   height: `110px`,
-                  // }}
+                  style={{
+                    borderRadius: `5px`,
+                    height: `110px`,
+                    paddingTop: `40px`,
+                    margin: `10px`,
+                    backgroundColor: `#0766AD`,
+                    color: `white`,
+                    textAlign: `center`,
+                  }}
+                  onClick={() => handleChooseOp(1)}
                 >
-                  {/* <h4>C: </h4> */}
-                  <Button variant="primary" size="lg" onClick={handleSubmitNameSession}>
                   Create Session
-                  </Button>
                 </Col>
                 <Col
-                  // style={{
-                  //   border: `1px solid #ced4da`,
-                  //   borderRadius: `5px`,
-                  //   height: `110px`,
-                  // }}
+                  style={{
+                    borderRadius: `5px`,
+                    height: `110px`,
+                    paddingTop: `40px`,
+                    margin: `10px`,
+                    backgroundColor: `#FFC436`,
+                    color: `black`,
+                    textAlign: `center`,
+                  }}
+                  onClick={() => handleChooseOp(2)}
                 >
-                  {/* <h4>: </h4> */}
-                  <Button variant="info" size="lg" onClick={handleSubmitNameSession}>
                   Join Session
-                  </Button>
                 </Col>
+              </Row>
+              <Row>
+                {showInsertId.create_session ? (
+                  <Col>
+                    Session ID
+                    {/* <Form.Group className="mb-3" controlId="Name">
+                      <Form.Control
+                        type="text"
+                        placeholder=""
+                        onChange={handleName}
+                      />
+                    </Form.Group> */}
+                    <InputGroup className="mb-3">
+                      <Form.Control
+                        defaultValue={nameSession}
+                        placeholder="Session"
+                        aria-label="Recipient's username"
+                        aria-describedby="basic-addon2"
+                        ref={textAreaRef}
+                      />
+                      <Button
+                        variant="outline-secondary"
+                        id="button-addon2"
+                        onClick={copyToClipboard}
+                      >
+                        {copySuccess != '' ? <>{copySuccess}</> : <>Copy</>}
+                      </Button>
+                      ¸
+                    </InputGroup>
+                  </Col>
+                ) : (
+                  <Col></Col>
+                )}
+                {showInsertId.join_session ? (
+                  <Col>
+                    Session ID
+                    <Form.Group className="mb-3" controlId="Name">
+                      <Form.Control
+                        type="text"
+                        placeholder=""
+                        onChange={handleName}
+                      />
+                    </Form.Group>
+                  </Col>
+                ) : (
+                  <Col></Col>
+                )}
               </Row>
               <Row>
                 <Col>
