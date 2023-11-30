@@ -76,13 +76,13 @@ export default function App() {
           session_id: nameSession,
         });
       } else {
-        //     set(ref(db, `/cartas_usuario/${uuid}`), {
-        //       carta: value,
-        //       user: name,
-        //       id: uuid,
-        //       user_id : atob(window.sessionStorage.getItem('userCode')),
-        //       session_id: nameSession,
-        //     });
+            set(ref(db, `/cartas_usuario/${uuid}`), {
+              carta: value,
+              user: name,
+              id: uuid,
+              user_id : atob(window.sessionStorage.getItem('userCode')),
+              session_id: nameSession,
+            });
       }
     } else {
       set(ref(db, `/cartas_usuario/${uuid}`), {
