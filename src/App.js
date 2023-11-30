@@ -66,7 +66,7 @@ export default function App() {
       const filteredObj = Object.values(data.cartas_usuario).filter(
         (item) => item.user.toLowerCase() === name.toLocaleLowerCase()
       )[0];
-      console.log(filteredObj);
+      // console.log(filteredObj);
       if (filteredObj) {
         set(ref(db, `/cartas_usuario/${filteredObj.id}`), {
           carta: value,
@@ -133,12 +133,9 @@ export default function App() {
       // console.log(data);
       const filtered_cartas_usuario = [];
       if (data.hasOwnProperty('cartas_usuario')) {
-        console.log(data.cartas_usuario)
-        // const filtered = Object.values(data.cartas_usuario).filter(
-        //   (item) => item.session_id === nameSession
-        // );
-
-        // console.log('Data: ', nameSession, filtered);
+        // console.log(data.cartas_usuario)
+        
+        Object.values(data.cartas_usuario).map((carta) => ( console.log(carta)))
       }
 
       const new_users = [];
